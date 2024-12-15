@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+
+    <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Titre modal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-7 alertPlaceholder"></div>
+    </div>
+
+
+    <div class="row justify-content-center mt-3">
+        <button id="add-user" class="col-md-4 btn btnsubmit mt-3">Ajouter un utilisateur</button>
+        <div class="col-md-9 mt-4">
+            <table id="usersTable" class="display" width="100%">
+                <thead>
+                    <tr>
+                        <th>Identifiant</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Mail</th>
+                        <th>Rôle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    const userId = {{ user.id }};
+    const fr_url = "{% static 'librairie/datatables/fr_fr.json' %}";
+    const user_group = "{{ user_group }}";
+    console.log(userId)
+</script>
+<script src="{% static 'js/forms.js' %}"></script>
+<script src="{% static 'authentification/js/users.js' %}"></script>
+{% endblock %}

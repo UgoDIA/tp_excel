@@ -1,0 +1,67 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#"><img class="mx-3" src="" style="max-height: 50px;" /></a>
+
+
+
+    <div class="navbar-center">
+        <a href="{% url 'main:index' %}">
+            <h1 class="d-inline-block align-middle titre">
+                <span class="texte-bleu">TP EXCEL</span>
+            </h1>
+        </a>
+    </div>
+
+
+    {% if user.is_authenticated %}
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+
+        <ul class="navbar-nav fs-5">
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="{% url 'authentification:page_users' %}"><img class=""  style="max-height: 30px; margin-top:-10px" src="{% static 'images/users.png' %}" alt=""></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <img class="mx-1" src="{% static 'images/burger-bar.png' %}" alt="user icon"
+                        style="max-height: 35px; margin-top:-10px" />
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end fs-6 mr-5 text-center" aria-labelledby="userDropdown">
+                    <li>
+                        <p class="dropdown-item-text texte_bleu"
+                            style="text-transform: uppercase; margin-bottom: -5px; white-space: nowrap;">
+                            <img class="mx-1" src="{% static 'images/user_icon_no_circle.png' %}" alt="user icon"
+                                style="max-height: 15px; margin-top: -5px;" />
+                            {{ user.get_username }}
+                        </p>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu"
+                            href="https://si-mytableau.edf.fr/#/site/SEI/views/STATSADEL/listevip" target="_blank">Les
+                            bases essentielles à connaître</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu" href="{% static 'documentation/tp_excel.pdf' %}"
+                            target="_blank">Documentation</a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <div class="mx-5">
+                            <a href="{% url 'authentification:logout' %}?next={{ request.path }}"><img class=""
+                                    src="{% static 'images/logout.png' %}" alt="logout" style="max-height: 20px;" /></a>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+</nav>
+<hr class="" style="margin-top: -5px">

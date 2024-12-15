@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="w-50 mx-auto text-center">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">Identifiant ou mot de passe incorrect</div>
+    {% endif %}
+    {% if next %}
+    {% if user.is_authenticated %}
+    <div class="alert alert-warning" role="alert">Vous n'avez pas accès à cette page</div>
+    {% else %}
+
+    {% endif %}
+    {% endif %}
+</div>
+
+
+<div class="container text-center mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4 border rounded shadow border-secondary p-4">
+            <div class="texte-bleu fw-bold fs-3 mb-4">Bienvenue</div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label texte-bleu fs-6">Identifiant</label>
+                    <input id="username" class="form-control" type="text" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label texte-bleu fs-6">Mot de passe</label>
+                    <input id="password" type="password" class="form-control" name="password" required>
+                </div>
+                <button type="submit" class="btn btnsubmit mt-3 w-100">Se connecter</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

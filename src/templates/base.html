@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>TP EXCEL</title>
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}" />
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+        <link rel="stylesheet" href="{% static 'librairie/bootstrap/bootstrap.min.css' %}" />
+        <link rel="stylesheet" href="{% static 'librairie/datatables/datatables.min.css' %}" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
+
+        {% block head %}{% endblock %}
+    </head>
+
+    <body>
+
+        {% include 'navbar.html' %}
+
+        {% block content %}{% endblock %}
+        <script src="{% static 'librairie/jquery/jquery-3.7.min.js' %}"></script>
+        <script src="{% static 'librairie/popper/popper.min.js' %}"></script>
+        <script src="{% static 'librairie/bootstrap/bootstrap.min.js' %}"></script>
+        <script src="{% static 'librairie/datatables/datatables.min.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+        {% block script %}{% endblock %}
+    </body>
+
+</html>
