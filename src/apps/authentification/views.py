@@ -8,18 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 
-def register_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Registration successful!")
-            return redirect('authentification:login')
-        else:
-            messages.error(request, "Registration failed. Please try again.")
-    else:
-        form = UserCreationForm()
-    return render(request, 'authentification/register.html', {'form': form})
 
 
 def login_view(request):

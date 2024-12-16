@@ -460,6 +460,9 @@ function generateEditFormHtml(key, rowData) {
         case 'categorie':
             formHtml = generateCategorieEditFormHtml(key, rowData);
             break;
+        case 'coureur':
+            formHtml = generateCoureurEditFormHtml(key, rowData);
+            break;
         default:
             formHtml = '<p>Formulaire non défini pour l\'édition.</p>';
     }
@@ -548,6 +551,171 @@ function generateCategorieEditFormHtml(key, rowData) {
     `;
 }
 
+function generateCoureurEditFormHtml(key, rowData) {
+
+    $.ajax({
+        url: `${window.location.origin}/tp_excel/api/course/`,
+        method: 'GET',
+        success: function (coursesResponse) {
+            $.ajax({
+                url: `${window.location.origin}/tp_excel/api/categorie/`,
+                method: 'GET',
+                success: function (categoriesResponse) {
+
+                    let courseOptions = coursesResponse.map(course => {
+                        return `<option value="${course.id_course}" ${course.id_course == rowData.course.id_course ? 'selected' : ''}>${course.nom}</option>`;
+                    }).join('');
+
+                    let repasAvantOptions = `
+                                <option value="true" ${rowData.repas_avant_course ? 'selected' : ''}>Oui</option>
+                                <option value="false" ${!rowData.repas_avant_course ? 'selected' : ''}>Non</option>
+                            `;
+
+                    let repasApresOptions = `
+                                <option value="true" ${rowData.repas_apres_course ? 'selected' : ''}>Oui</option>
+                                <option value="false" ${!rowData.repas_apres_course ? 'selected' : ''}>Non</option>
+                            `;
+
+                    const formHtml = `
+                                <form id="editForm">
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="nom" class="form-label">Nom</label>
+                                            <input type="text" class="form-control" id="nom" name="nom" value="${rowData.nom}" required>
+                                        </div>
+                                        <div class="col">
+                                            <label for="prenom" class="form-label">Prénom</label>
+                                            <input type="text" class="form-control" id="prenom" name="prenom" value="${rowData.prenom}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="sexe" class="form-label">Sexe</label>
+                                            <select class="form-select" id="sexe" name="sexe" required>
+                                                <option value="M" ${rowData.sexe === 'M' ? 'selected' : ''}>Masculin</option>
+                                                <option value="F" ${rowData.sexe === 'F' ? 'selected' : ''}>Féminin</option>
+                                                <option value="Autre" ${rowData.sexe === 'Autre' ? 'selected' : ''}>Autre</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <label for="date_de_naissance" class="form-label">Date de naissance</label>
+                                            <input type="date" class="form-control" id="date_de_naissance" name="date_de_naissance" value="${rowData.date_de_naissance}" required onchange="setCategorieFromDate()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="id_course" class="form-label">Course</label>
+                                            <select class="form-select" id="id_course" name="id_course" onchange="calculateTotalCoureur()" required>
+                                                ${courseOptions}
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <label for="taille_tee_shirt" class="form-label">Taille de T-shirt</label>
+                                            <select class="form-select" id="taille_tee_shirt" name="taille_tee_shirt" required>
+                                                <option value="S" ${rowData.taille_tee_shirt === 'S' ? 'selected' : ''}>S</option>
+                                                <option value="M" ${rowData.taille_tee_shirt === 'M' ? 'selected' : ''}>M</option>
+                                                <option value="L" ${rowData.taille_tee_shirt === 'L' ? 'selected' : ''}>L</option>
+                                                <option value="XL" ${rowData.taille_tee_shirt === 'XL' ? 'selected' : ''}>XL</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="repas_avant_course" class="form-label">Repas avant course</label>
+                                            <select class="form-select" id="repas_avant_course" name="repas_avant_course" onchange="calculateTotalCoureur()" required>
+                                                ${repasAvantOptions}
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <label for="repas_apres_course" class="form-label">Repas après course</label>
+                                            <select class="form-select" id="repas_apres_course" name="repas_apres_course" onchange="calculateTotalCoureur()" required>
+                                                ${repasApresOptions}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="categorie" class="form-label">Catégorie</label>
+                                            <input type="text" class="form-control" id="categorie" name="categorie" value="${rowData.categorie.code_categorie}" disabled>
+                                        </div>
+                                        <input type="hidden" id="id_categorie" name="id_categorie" value="${rowData.categorie.id_categorie}">
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="total_prix" class="form-label">Total à Payer</label>
+                                            <input type="text" class="form-control" id="total_prix" name="total_prix" value="${rowData.total_coureur}" disabled>
+                                        </div>
+                                        <input type="hidden" id="total_coureur" name="total_coureur" value="${rowData.total_coureur}">
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btnsubmit" onclick="handleFormEdit('${key}', '${rowData.id_coureur}')">Modifier</button>
+                                        <button type="button" class="btn btn-danger" onclick="handleFormDelete('${key}', ${rowData.id_coureur})">Supprimer</button>
+
+                                        </div>
+                                </form>
+                            `;
+
+                    $('.modal-body').html(formHtml);
+
+                    window.setCategorieFromDate = function () {
+                        const dateDeNaissance = $('#date_de_naissance').val();
+                        if (dateDeNaissance) {
+                            const birthYear = new Date(dateDeNaissance).getFullYear();
+
+                            const matchingCategorie = categoriesResponse.find(categorie => {
+                                const categorieYear = parseInt(categorie.annee, 10);
+                                return categorieYear == birthYear;
+                            });
+
+                            if (matchingCategorie) {
+                                $('#categorie').val(matchingCategorie.code_categorie);
+                                $('#id_categorie').val(matchingCategorie.id_categorie);
+                            }
+                        }
+                    };
+
+                    window.calculateTotalCoureur = function () {
+                        const idCourse = $('#id_course').val();
+                        const repasAvant = $('#repas_avant_course').val();
+                        const repasApres = $('#repas_apres_course').val();
+
+                        const selectedCourse = coursesResponse.find(course => course.id_course == idCourse);
+                        if (!selectedCourse) {
+                            $('#total_prix').val('');
+                            $('#total_coureur').val('');
+                            return;
+                        }
+
+                        const prixBase = parseFloat(selectedCourse.prix_15);
+
+                        let total = prixBase;
+
+                        if (repasAvant === 'true') total += 8;
+                        if (repasApres === 'true') total += 10;
+
+                        $('#total_prix').val(total.toFixed(2));
+                        $('#total_coureur').val(total.toFixed(2));
+                    };
+                },
+                error: function (error) {
+                    console.error('Erreur lors de la récupération des données de catégorie:', error);
+                    showAlert('Erreur lors de la récupération des données de catégorie.', 'danger');
+                }
+            });
+        },
+        error: function (error) {
+            console.error('Erreur lors de la récupération des données de course:', error);
+            showAlert('Erreur lors de la récupération des données de course.', 'danger');
+        }
+    });
+}
+
 
 
 /**
@@ -563,6 +731,8 @@ function getEditModalTitle(key) {
             return "Modification d'une course";
         case 'categorie':
             return "Modification d'une catégorie";
+        case 'coureur':
+            return "Modification d'un coureur/ d'une coureuse";
         default:
             return 'Modification';
     }
@@ -626,6 +796,7 @@ function handleFormEdit(key, id) {
         case 'users':
         case 'course':
         case 'categorie':
+        case 'coureur':
             url = `${domain}/tp_excel/api/${key}/${id}/`;
             break;
         default:
@@ -675,6 +846,7 @@ function handleFormDelete(key, id) {
         case 'users':
         case 'course':
         case 'categorie':
+        case 'coureur':
             url = `${domain}/tp_excel/api/${key}/${id}/`;
             break;
         default:
