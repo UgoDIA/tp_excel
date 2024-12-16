@@ -197,7 +197,6 @@ function populateCoureur(domain) {
 }
 
 
-// Function to fetch runners data and calculate the total amount
 function fetchRunnersDataAndTotal() {
     $.ajax({
         url: `${window.location.origin}/tp_excel/api/coureur/`,
@@ -206,9 +205,9 @@ function fetchRunnersDataAndTotal() {
             const raceCounts = {};
             let totalAmount = 0;
 
-            // Loop through the runners data
+          
             data.forEach(runner => {
-                // Group runners by course
+             
                 const courseName = runner.course.nom;
                 if (raceCounts[courseName]) {
                     raceCounts[courseName]++;
@@ -216,27 +215,27 @@ function fetchRunnersDataAndTotal() {
                     raceCounts[courseName] = 1;
                 }
 
-                // Add the total amount from this runner to the totalAmount
-                totalAmount += parseFloat(runner.total_coureur); // Make sure to convert to float
+         
+                totalAmount += parseFloat(runner.total_coureur);
             });
 
-            // Display the race counts in the first table
+      
             displayRaceCounts(raceCounts);
 
-            // Display the total amount in the second table
+       
             displayTotalAmount(totalAmount);
         },
         error: function (error) {
             console.error('Error fetching runners data:', error);
-            // Handle errors (e.g., show an alert or message)
+         
         }
     });
 }
 
-// Function to display the race counts in the table
+
 function displayRaceCounts(raceCounts) {
     const tbody = $('#runnersTable tbody');
-    tbody.empty(); // Clear existing table rows
+    tbody.empty();
 
     for (const [courseName, count] of Object.entries(raceCounts)) {
         const rowHtml = `
@@ -245,24 +244,23 @@ function displayRaceCounts(raceCounts) {
                 <td>${count}</td>
             </tr>
         `;
-        tbody.append(rowHtml); // Append the new row
+        tbody.append(rowHtml);
     }
 }
 
-// Function to display the total amount in the second table
+
 function displayTotalAmount(totalAmount) {
     const tbody = $('#totalCoureurTable tbody');
-    tbody.empty(); // Clear existing table rows
+    tbody.empty(); 
 
     const rowHtml = `
         <tr>
             <td>${totalAmount.toFixed(2)} €</td> <!-- Format as currency -->
         </tr>
     `;
-    tbody.append(rowHtml); // Append the new row
+    tbody.append(rowHtml); 
 }
 
-// Call the function to load and calculate data when the page is ready
 $(document).ready(function () {
     fetchRunnersDataAndTotal();
 });
