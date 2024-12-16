@@ -19,7 +19,8 @@
 
         <ul class="navbar-nav fs-5">
             <li class="nav-item dropdown">
-                <a class="nav-link" href="{% url 'authentification:page_users' %}"><img class=""  style="max-height: 30px; margin-top:-10px" src="{% static 'images/users.png' %}" alt=""></a>
+                <a class="nav-link" href="{% url 'authentification:page_users' %}"><img class=""
+                        style="max-height: 30px; margin-top:-10px" src="{% static 'images/users.png' %}" alt=""></a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown"
@@ -39,14 +40,12 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item texte-bleu"
-                            href="https://si-mytableau.edf.fr/#/site/SEI/views/STATSADEL/listevip" target="_blank">Les
-                            bases essentielles à connaître</a></li>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">Les bases essentielles à
+                            connaître</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item texte-bleu" href="{% static 'documentation/tp_excel.pdf' %}"
-                            target="_blank">Documentation</a>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp2:page_tp2' %}">Grand Raid</a>
                     </li>
                     <li>
                         <hr class="dropdown-divider">

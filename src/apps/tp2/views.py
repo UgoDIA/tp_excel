@@ -3,11 +3,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 # Create your views here.
-
-def redirection(request):
-    return HttpResponseRedirect(reverse('tp1:page_tp1'))
-
-
 @login_required
-def page_main(request):
-    return render(request, 'main/index.html')
+def page_tp2(request):
+    return render(request, 'tp2/tp2.html')

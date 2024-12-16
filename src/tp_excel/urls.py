@@ -22,4 +22,6 @@ urlpatterns = [
     path('', include('apps.main.urls')),
     path('tp_excel/', include('apps.api.urls')),
     path('tp_excel/auth/', include('apps.authentification.urls')),
+    path('tp_excel/tp1/', include('apps.tp1.urls')),
+    path('tp_excel/tp2/', include('apps.tp2.urls')),
 ]

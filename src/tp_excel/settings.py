@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.authentification',
     'apps.main',
     'apps.tp1',
+    'apps.tp2',
     'rest_framework',
 ]
 
