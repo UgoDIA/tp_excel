@@ -2,7 +2,14 @@
 {% load static %}
 {% block content %}
 
+
+
 <div class="container my-5">
+    {% include "modal.html" %}
+
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-7 alertPlaceholder"></div>
+    </div>
     <!-- Tabs Navigation -->
     <h5 class="text-center texte-bleu">Grand Raid</h5>
     <ul class="nav nav-tabs justify-content-center mt-4" id="myTab" role="tablist">
@@ -19,14 +26,14 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab"
-                aria-controls="tab2" aria-selected="false">
+            <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab"
+                aria-controls="tab3" aria-selected="false">
                 Courses
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab"
-                aria-controls="tab2" aria-selected="false">
+            <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab"
+                aria-controls="tab4" aria-selected="false">
                 Catégories
             </button>
         </li>
@@ -38,7 +45,7 @@
 
         <div class="tab-pane fade show active " id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
             <div class="d-flex flex-column align-items-center ">
-                <button id="addRowButton" class="btn btnsubmit mb-3">+</button>
+
                 <div id="table_synthese"></div>
             </div>
         </div>
@@ -46,22 +53,32 @@
 
         <div class="tab-pane fade " id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
             <div class="d-flex flex-column align-items-center">
-                <button id="addRowButton" class="btn btnsubmit mb-3">+</button>
-                <div id="table_coureur"></div>
+                <button id="add-coureur" class="btn btnsubmit mb-3">+</button>
+                <div id="table_coureur">
+                    <table id="coureurTable" class="display" width="100%">
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="tab-pane fade " id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
             <div class="d-flex flex-column align-items-center">
-                <button id="addRowButton" class="btn btnsubmit mb-3">+</button>
-                <div id="table_course"></div>
+                <button id="add-course" class="btn btnsubmit mb-3">+</button>
+
+                <div id="table_course">
+                    <table id="courseTable" class="display" width="100%">
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="tab-pane fade " id="tab4" role="tabpanel" aria-labelledby="tab4-tab">
             <div class="d-flex flex-column align-items-center">
-                <button id="addRowButton" class="btn btnsubmit mb-3">+</button>
-                <div id="table_categorie"></div>
+                <button id="add-categorie" class="btn btnsubmit mb-3">+</button>
+                <div id="table_categorie">
+                    <table id="categorieTable" class="display" width="100%">
+                    </table>
+                </div>
             </div>
         </div>
 

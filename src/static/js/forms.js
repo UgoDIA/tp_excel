@@ -17,13 +17,18 @@ function openAddModal(key) {
  */
 function generateFormHtml(key) {
     let formHtml = '';
-    // 
     switch (key) {
         case 'users':
             formHtml = generateUsersFormHtml(key);
             break;
-        case 'stats_adel_vip':
-            formHtml = generateVIPFormHtml();
+        case 'course':
+            formHtml = generateCourseFormHtml(key);
+            break;
+        case 'categorie':
+            formHtml = generateCategorieFormHtml(key);
+            break;
+        case 'coureur':
+            formHtml = generateCoureurFormHtml(key);
             break;
         default:
             formHtml = '<p>Formulaire non défini.</p>';
@@ -64,7 +69,7 @@ function generateUsersFormHtml(key) {
                     <select class="form-select" id="groups" name="groups" required>
                         <option value="" disabled selected>Sélectionner</option>
                         <option value="1">Admin</option>
-                        <option value="0">Employé</option>
+                        <option value="2">Employé</option>
                     </select>
                 </div>
                 <button type="button" class="btn btnsubmit" onclick="handleFormAdd('${key}')">Créer</button>
@@ -73,31 +78,221 @@ function generateUsersFormHtml(key) {
 }
 
 /**
- * Génère le HTML du formulaire pour l'agent
- * @returns {string} - Le HTML du formulaire pour l'agent.
+ * Génère le HTML du formulaire pour ajouter une course
+ * @returns {string} - Le HTML du formulaire pour ajouter une course
  */
-function generateVIPFormHtml() {
+function generateCourseFormHtml(key) {
     return `
         <form id="addForm">
-            <div class="row mb-3">
-                <div class="">
-                    <label for="nom_vip" class="form-label">Nom de la nouvelle liste VIP</label>
-                    <input type="text" class="form-control" id="nom_vip" name="nom_vip" required>
-                </div>
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom de la Course</label>
+                <input type="text" class="form-control" id="nom" name="nom" required>
             </div>
-            <div class="row mb-3">
-                <div class="col-auto">
-                 Diffusion Open Data :
-                </div>
-                <div class=" col-auto form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="diffusion_open_data" name="diffusion_open_data">
-                </div>
-    
+            <div class="mb-3">
+                <label for="prix_15" class="form-label">Prix -15%</label>
+                <input type="number" step="0.01" class="form-control" id="prix_15" name="prix_15" required>
             </div>
-            <button type="button" class="btn btnsubmit mt-3" onclick="handleFormAdd('stats_adel_vip')">Enregistrer</button>
+            <div class="mb-3">
+                <label for="prix_20" class="form-label">Prix -20%</label>
+                <input type="number" step="0.01" class="form-control" id="prix_20" name="prix_20" required>
+            </div>
+            <button type="button" class="btn btnsubmit" onclick="handleFormAdd('${key}')">Créer</button>
         </form>
     `;
 }
+
+function generateCategorieFormHtml(key) {
+    return `
+        <form id="addForm">
+            <div class="mb-3">
+                <label for="annee" class="form-label">Année</label>
+                <input type="number" class="form-control" id="annee" name="annee" required>
+            </div>
+            <div class="mb-3">
+                <label for="code_categorie" class="form-label">Code Catégorie</label>
+                <input type="text" class="form-control" id="code_categorie" name="code_categorie" required>
+            </div>
+            <button type="button" class="btn btnsubmit" onclick="handleFormAdd('${key}')">Créer</button>
+        </form>
+    `;
+}
+
+function generateCoureurFormHtml(key) {
+    $.ajax({
+        url: `${window.location.origin}/tp_excel/api/course/`,
+        method: 'GET',
+        success: function (coursesResponse) {
+            $.ajax({
+                url: `${window.location.origin}/tp_excel/api/categorie/`,
+                method: 'GET',
+                success: function (categoriesResponse) {
+
+                    let courseOptions = coursesResponse.map(course => {
+                        return `<option value="${course.id_course}">${course.nom}</option>`;
+                    }).join('');
+
+
+                    const formHtml = `
+                        <form id="addForm">
+                        
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="nom" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="nom" name="nom" required>
+                                </div>
+                                <div class="col">
+                                    <label for="prenom" class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" id="prenom" name="prenom" required>
+                                </div>
+                            </div>
+
+                       
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="sexe" class="form-label">Sexe</label>
+                                    <select class="form-select" id="sexe" name="sexe" required>
+                                        <option value="" disabled selected>Sélectionner</option>
+                                        <option value="M">Masculin</option>
+                                        <option value="F">Féminin</option>
+                                        <option value="Autre">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="date_de_naissance" class="form-label">Date de naissance</label>
+                                    <input type="date" class="form-control" id="date_de_naissance" name="date_de_naissance" required onchange="setCategorieFromDate()">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="id_course" class="form-label">Course</label>
+                                    <select class="form-select" id="id_course" name="id_course" onchange="calculateTotalCoureur()" required>
+                                        <option value="" disabled selected>Choisir une course</option>
+                                        ${courseOptions}
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="taille_tee_shirt" class="form-label">Taille de T-shirt</label>
+                                    <select class="form-select" id="taille_tee_shirt" name="taille_tee_shirt" required>
+                                        <option value="" disabled selected>Choisir une taille</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="repas_avant_course" class="form-label">Repas avant course</label>
+                                    <select class="form-select" id="repas_avant_course" name="repas_avant_course" onchange="calculateTotalCoureur()" required>
+                                        <option value="" disabled selected>Sélectionner</option>
+                                        <option value="true">Oui</option>
+                                        <option value="false">Non</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="repas_apres_course" class="form-label">Repas après course</label>
+                                    <select class="form-select" id="repas_apres_course" name="repas_apres_course" onchange="calculateTotalCoureur()" required>
+                                        <option value="" disabled selected>Sélectionner</option>
+                                        <option value="true">Oui</option>
+                                        <option value="false">Non</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                       
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="categorie" class="form-label">Catégorie</label>
+                                    <input type="text" class="form-control" id="categorie" name="categorie" disabled>
+                                </div>
+                                <input type="hidden" id="id_categorie" name="id_categorie">
+
+                            </div>
+                           <div class="row mb-3">
+                                <div class="col">
+                                    <label for="total_prix" class="form-label">Total à Payer</label>
+                                    <input type="text" class="form-control" id="total_prix" name="total_prix" disabled>
+                                </div>
+                                <input type="hidden" id="total_coureur" name="total_coureur">
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btnsubmit" onclick="handleFormAdd('${key}')">Créer</button>
+                            </div>
+                        </form>
+                    `;
+
+
+                    $('.modal-body').html(formHtml);
+
+                    window.setCategorieFromDate = function () {
+                        const dateDeNaissance = $('#date_de_naissance').val();
+                        if (dateDeNaissance) {
+                            const birthYear = new Date(dateDeNaissance).getFullYear();
+
+                            const matchingCategorie = categoriesResponse.find(categorie => {
+
+                                const categorieYear = parseInt(categorie.annee, 10);
+                                return categorieYear == birthYear;
+                            });
+
+                            if (matchingCategorie) {
+                                $('#categorie').val(matchingCategorie.code_categorie);
+                                $('#id_categorie').val(matchingCategorie.id_categorie);
+                            }
+                        }
+                    };
+                    window.calculateTotalCoureur = function () {
+                        const idCourse = $('#id_course').val();
+                        const repasAvant = $('#repas_avant_course').val();
+                        const repasApres = $('#repas_apres_course').val();
+                        console.log(idCourse, repasAvant, repasApres);
+
+                        const selectedCourse = coursesResponse.find(course => course.id_course == idCourse);
+                        if (!selectedCourse) {
+                            $('#total_prix').val('');
+                            $('#total_prix').val('');
+                            return;
+                        }
+
+                        const prixBase = parseFloat(selectedCourse.prix_15);
+
+                        if (idCourse && repasAvant !== null && repasApres !== null) {
+                            let total = prixBase;
+
+
+                            if (repasAvant === 'true') total += 8;
+
+
+                            if (repasApres === 'true') total += 10;
+
+
+                            $('#total_prix').val(total.toFixed(2));
+                            $('#total_coureur').val(total.toFixed(2));
+                        } else {
+
+                            $('#total_prix').val('');
+                            $('#total_coureur').val('');
+                        }
+                    };
+
+                },
+                error: function (error) {
+                    console.error('Erreur lors de la récupération des données de catégorie:', error);
+                    showAlert('Erreur lors de la récupération des données de catégorie.', 'danger');
+                }
+            });
+        },
+        error: function (error) {
+            console.error('Erreur lors de la récupération des données de course:', error);
+            showAlert('Erreur lors de la récupération des données de course.', 'danger');
+        }
+    });
+}
+
 
 
 /**
@@ -109,8 +304,12 @@ function getModalTitle(key) {
     switch (key) {
         case 'users':
             return "Ajout d'un nouveau vip";
-        case 'stats_adel_vip':
-            return "Ajout d'une nouvelle liste";
+        case 'course':
+            return "Ajout d'une nouvelle course";
+        case 'categorie':
+            return "Ajout d'une nouvelle catégorie";
+        case 'coureur':
+            return "Ajout d'un nouveau coureur/ nouvelle coureuse";
         default:
             return 'Ajout';
     }
@@ -119,7 +318,7 @@ function getModalTitle(key) {
 
 /**
  * gere envoi du formulaire d'ajout
- * @param {string} key - cle qui identifie le formulaire a generer (vp, flux, evt, agence).
+ * @param {string} key - cle qui identifie le formulaire a generer.
  */
 function handleFormAdd(key) {
     const form = $('#addForm');
@@ -131,8 +330,10 @@ function handleFormAdd(key) {
 
 
     switch (key) {
-        case 'stats_adel_vip':
+        case 'course':
         case 'users':
+        case 'categorie':
+        case 'coureur':
             url = `${domain}/tp_excel/api/${key}/`;
             break;
         default:
@@ -177,6 +378,10 @@ function handleFormAdd(key) {
     if (data.groups) {
         data.groups = [parseInt(data.groups)];
     }
+    if (data.annee) {
+        const year = parseInt(data.annee);
+        data.annee = `${year}-01-01`;
+    }
     $.ajax({
         url: url,
         method: method,
@@ -192,14 +397,10 @@ function handleFormAdd(key) {
             $('#modalForm').modal('hide');
             $('#' + table_id).DataTable().ajax.reload(null, false);
 
-            if (key === 'stats_adel_vip') {
-                const vipSelect = $('#vip_select');
-                populateListeVIPSelect(domain, vipSelect, response.id);
-                histo(domain, 'create', user_nni, null, response.id, data);
+            if (key === 'course') {
 
 
             } else if (key === 'users') {
-                // histo(domain, 'create', user_nni, response.id, data.id_stats_adel_vip, data);
 
             }
 
@@ -213,7 +414,7 @@ function handleFormAdd(key) {
 }
 
 function fetchOne(domain, key, id) {
-    let apiUrl = domain + '/viping/api/' + key + '/' + id + '/'
+    let apiUrl = domain + '/tp_excel/api/' + key + '/' + id + '/'
 
     $.ajax({
         url: apiUrl,
@@ -251,10 +452,13 @@ function generateEditFormHtml(key, rowData) {
     let formHtml = '';
     switch (key) {
         case 'users':
-            formHtml = generateListeVIPEditFormHtml(key, rowData);
+            formHtml = generateUserEditFormHtml(key, rowData);
             break;
-        case 'stats_adel_vip':
-            formHtml = generateVIPEditFormHtml(rowData);
+        case 'course':
+            formHtml = generateCourseEditFormHtml(key, rowData);
+            break;
+        case 'categorie':
+            formHtml = generateCategorieEditFormHtml(key, rowData);
             break;
         default:
             formHtml = '<p>Formulaire non défini pour l\'édition.</p>';
@@ -267,86 +471,83 @@ function generateEditFormHtml(key, rowData) {
  * @param {object} rowData - Données de la commune.
  * @returns {string} - Le HTML du formulaire de modification pour la commune.
  */
-function generateListeVIPEditFormHtml(key, rowData) {
+function generateUserEditFormHtml(key, rowData) {
     return `
         <form id="editForm">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="prm" class="form-label">PRM</label>
-                    <input type="text" class="form-control" id="prm" name="prm" value="${replaceNull(rowData.prm)}" >
-                </div>
-                <div class="col-md-6">
-                    <label for="edl" class="form-label">EDL</label>
-                    <input type="text" class="form-control" id="edl" name="edl" value="${replaceNull(rowData.edl)}" >
-                </div>
+              <div class="mb-3">
+                <label for="username" class="form-label">Identifiant</label>
+                <input type="text" class="form-control" id="username" name="username" value="${replaceNull(rowData.username)}" required>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="nom_client" class="form-label">Nom</label>
-                    <input type="text" class="form-control" id="nom_client" name="nom_client" value="${replaceNull(rowData.nom_client)}" >
-                </div>
-                <div class="col-md-6">
-                    <label for="ref_externe_client" class="form-label">Ref. externe</label>
-                    <input type="text" class="form-control" id="ref_externe_client" name="ref_externe_client" value="${replaceNull(rowData.ref_externe_client)}" >
-                </div>
+            <div class="mb-3">
+                <label for="first_name" class="form-label">Prénom</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" value="${replaceNull(rowData.first_name)}" required>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="code_prio" class="form-label">Priorité</label>
-                    <select class="form-select" id="code_prio" name="code_prio">
-                        <option value="" disabled ${rowData.code_prio === null ? 'selected' : ''}>Sélectionner</option>
-                        <option value="1" ${rowData.code_prio == 1 ? 'selected' : ''}>1</option>
-                        <option value="2" ${rowData.code_prio == 2 ? 'selected' : ''}>2</option>
-                        <option value="3" ${rowData.code_prio == 3 ? 'selected' : ''}>3</option>
-                        <option value="4" ${rowData.code_prio == 4 ? 'selected' : ''}>4</option>
-                        <option value="5" ${rowData.code_prio == 5 ? 'selected' : ''}>5</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="ordre" class="form-label">Ordre</label>
-                    <input type="number" class="form-control" id="ordre" name="ordre" value="${replaceNull(rowData.ordre)}" >
-                </div>
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Nom</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" value="${replaceNull(rowData.last_name)}" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Mail</label>
+                <input type="email" class="form-control" id="email" name="email" value="${replaceNull(rowData.email)}" required>
+            </div>
+            <div class="mb-3">
+                <label for="groups" class="form-label">Rôle</label>
+                <select class="form-select" id="groups" name="groups" required>
+                    <option value="" disabled ${rowData.groups === null ? 'selected' : ''}>Sélectionner</option>
+                    <option value="1" ${rowData.groups == 1 ? 'selected' : ''}>Admin</option>
+                    <option value="2" ${rowData.groups == 2 ? 'selected' : ''}>Employé</option>
+                </select>
             </div>
             <div class="d-flex justify-content-between">
-                <button type="button" class="btn btnsubmit" onclick="handleFormEdit('${key}', ${rowData.id_users})">Enregistrer</button>
-                <button type="button" class="btn btn-danger" onclick="handleFormDelete('${key}','${rowData.id_users}')" >Supprimer</button>
+                <button type="button" class="btn btnsubmit" onclick="handleFormEdit('${key}', ${rowData.id})">Enregistrer</button>
+                <button type="button" class="btn btn-danger" onclick="handleFormDelete('${key}', ${rowData.id})">Supprimer</button>
             </div>
         </form>
     `;
 }
 
-/**
- * Génère le HTML du formulaire pour modifier un agent
- * @param {object} rowData - Données de l'agent.
- * @returns {string} - Le HTML du formulaire de modification pour l'agent.
- */
-function generateVIPEditFormHtml(rowData) {
-    const isChecked = rowData.diffusion_open_data ? 'checked' : '';
+function generateCourseEditFormHtml(key, rowData) {
     return `
         <form id="editForm">
-            <div class="row mb-3">
-                <div class="">
-                    <label for="nom_vip" class="form-label">Nom de la liste</label>
-                    <input type="text" class="form-control" id="nom_vip" name="nom_vip" value="${replaceNull(rowData.nom_vip)}" >
-                </div>
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom de la Course</label>
+                <input type="text" class="form-control" id="nom" name="nom" value="${replaceNull(rowData.nom)}" required>
             </div>
-            <div class="row mb-4">
-                <div class="col-auto">
-                 Diffusion Open Data :
-                </div>
-                <div class=" col-auto form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="diffusion_open_data" name="diffusion_open_data" ${isChecked}>
-                </div>
-    
+            <div class="mb-3">
+                <label for="prix_15" class="form-label">Prix -15%</label>
+                <input type="number" step="0.01" class="form-control" id="prix_15" name="prix_15" value="${replaceNull(rowData.prix_15)}" required>
             </div>
-          
+            <div class="mb-3">
+                <label for="prix_20" class="form-label">Prix -20%</label>
+                <input type="number" step="0.01" class="form-control" id="prix_20" name="prix_20" value="${replaceNull(rowData.prix_20)}" required>
+            </div>
             <div class="d-flex justify-content-between">
-                <button type="button" class="btn btnsubmit mx-5" onclick="handleFormEdit('stats_adel_vip', ${rowData.id_stats_adel_vip})">Enregistrer</button>
-                <button type="button" class="btn btn-danger mx-5" onclick="handleFormDelete('stats_adel_vip','${rowData.id_stats_adel_vip}')">Supprimer</button>
+                <button type="button" class="btn btnsubmit" onclick="handleFormEdit('${key}', ${rowData.id_course})">Enregistrer</button>
+                <button type="button" class="btn btn-danger" onclick="handleFormDelete('${key}', ${rowData.id_course})">Supprimer</button>
             </div>
         </form>
     `;
 }
+
+function generateCategorieEditFormHtml(key, rowData) {
+    return `
+        <form id="editForm">
+            <div class="mb-3">
+                <label for="annee" class="form-label">Année</label>
+                <input type="number" class="form-control" id="annee" name="annee" value="${replaceNull(rowData.annee ? rowData.annee.split('-')[0] : '')}" required>
+            </div>
+            <div class="mb-3">
+                <label for="code_categorie" class="form-label">Code Catégorie</label>
+                <input type="text" class="form-control" id="code_categorie" name="code_categorie" value="${replaceNull(rowData.code_categorie)}" required>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btnsubmit" onclick="handleFormEdit('${key}', ${rowData.id_categorie})">Enregistrer</button>
+                <button type="button" class="btn btn-danger" onclick="handleFormDelete('${key}', ${rowData.id_categorie})">Supprimer</button>
+            </div>
+        </form>
+    `;
+}
+
 
 
 /**
@@ -357,9 +558,11 @@ function generateVIPEditFormHtml(rowData) {
 function getEditModalTitle(key) {
     switch (key) {
         case 'users':
-            return "Modification d'une ligne";
-        case 'stats_adel_vip':
-            return "Modification d'une liste";
+            return "Modification d'une utilisateur";
+        case 'course':
+            return "Modification d'une course";
+        case 'categorie':
+            return "Modification d'une catégorie";
         default:
             return 'Modification';
     }
@@ -380,15 +583,6 @@ function handleFormEdit(key, id) {
     let url = '';
     let method = 'PUT';
     let hasInvalidField = false;
-    if (key === 'users') {
-        let prmValue = $('#prm').val().trim();
-        let edlValue = $('#edl').val().trim();
-        if (!prmValue && !edlValue) {
-            hasInvalidField = true;
-            $('#prm, #edl').addClass('is-invalid');
-            $('#edl').after('<div class="invalid-feedback">Au moins un de ces champs est requis.</div>');
-        }
-    }
 
     form.find('input, select').each(function () {
         let value = $(this).val();
@@ -420,17 +614,19 @@ function handleFormEdit(key, id) {
     form_data.forEach(item => {
         data[item.name] = item.value === '' ? null : item.value;
     });
-    if (key === 'stats_adel_vip') {
-        data.diffusion_open_data = $('#diffusion_open_data').is(':checked');
+    if (data.groups) {
+        data.groups = [parseInt(data.groups)];
     }
-
-
+    if (data.annee) {
+        const year = parseInt(data.annee);
+        data.annee = `${year}-01-01`;
+    }
 
     switch (key) {
         case 'users':
-        case 'stats_adel_vip':
-        case 'poste_depart':
-            url = `${domain}/viping/api/${key}/${id}/`;
+        case 'course':
+        case 'categorie':
+            url = `${domain}/tp_excel/api/${key}/${id}/`;
             break;
         default:
             return;
@@ -451,13 +647,10 @@ function handleFormEdit(key, id) {
             table_id = key + 'Table'
             $('#' + table_id).DataTable().ajax.reload(null, false);
 
-            if (key === 'stats_adel_vip') {
-                const vipSelect = $('#vip_select');
-                populateListeVIPSelect(domain, vipSelect, id);
-                histo(domain, 'update', user_nni, null, id, data);
+            if (key === 'course') {
+
             } else if (key === 'users') {
-                let selectedVIP = $('#vip_select').val();
-                histo(domain, 'update', user_nni, id, selectedVIP, data);
+
             }
         },
         error: function (error) {
@@ -480,8 +673,9 @@ function handleFormDelete(key, id) {
 
     switch (key) {
         case 'users':
-        case 'stats_adel_vip':
-            url = `${domain}/viping/api/${key}/${id}/`;
+        case 'course':
+        case 'categorie':
+            url = `${domain}/tp_excel/api/${key}/${id}/`;
             break;
         default:
             return;
@@ -500,24 +694,11 @@ function handleFormDelete(key, id) {
                 table_id = key + 'Table'
                 $('#' + table_id).DataTable().ajax.reload(null, false);
 
-                if (key === 'stats_adel_vip') {
-                    const vipSelect = $('#vip_select');
-                    populateListeVIPSelect(domain, vipSelect);
-                    $('#addListeVIP').hide();
-                    // $('#ImportDiv').hide();
-                    $('#editVIP').hide();
-                    $('#deleteVIP').hide();
-                    $('#liste_vipTable').DataTable().destroy();
-                    $('#liste_vipTable').hide();
-                    $('#export').hide();
-                    $('#borderTable').hide();
-                    $('#hr2').hide();
-                    $('#vipText').empty();
-                    histo(domain, 'delete', user_nni, null, id);
+                if (key === 'course') {
+
 
                 } else if (key === 'users') {
-                    let selectedVIP = $('#vip_select').val();
-                    histo(domain, 'delete', user_nni, id, selectedVIP);
+
                 }
 
             },
@@ -597,7 +778,7 @@ function showAlert(message, type) {
  */
 function histo(domain, action, user, id_item = null, id_liste = null, valeur = null) {
     console.log(valeur)
-    const url = domain + '/viping/api/stats_adel_histo/';
+    const url = domain + '/tp_excel/api/stats_adel_histo/';
     const csrftoken = getCookie('csrftoken');
 
     if (valeur !== null && typeof valeur !== 'string') {
@@ -628,28 +809,6 @@ function histo(domain, action, user, id_item = null, id_liste = null, valeur = n
         error: function (error) {
             console.error('Erreur enregistrement histo', error);
 
-        }
-    });
-}
-
-function check_maj() {
-    const domain = window.location.origin;
-    const majVizButton = $('#maj_viz');
-    $.ajax({
-        url: domain + '/viping/api/query/get_maj_viz/',
-        type: 'GET',
-        success: function (response) {
-            if (response.length > 0) {
-                majVizButton.show();
-                console.log("Mise à jour disponible");
-            } else {
-                console.log("Aucune mise à jour disponible");
-                majVizButton.hide();
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Erreur lors de la vérification de la mise à jour:", error);
-            majVizButton.hide();
         }
     });
 }

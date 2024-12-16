@@ -30,7 +30,7 @@ class Course(models.Model):
 class Categorie(models.Model):
     id_categorie = models.AutoField(primary_key=True)
     annee = models.DateField(blank=True, null=True)
-    code_categorie = models.CharField(max_length=2, blank=True, null=True)
+    code_categorie = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
         db_table = 'categorie'
@@ -60,3 +60,4 @@ class Coureur(models.Model):
 
     def __str__(self):
         return f"{self.nom} {self.prenom}" if self.nom and self.prenom else f"Coureur {self.id_coureur}"
+

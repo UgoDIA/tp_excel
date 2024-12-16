@@ -38,7 +38,7 @@ function populateUser(domain) {
                 render: function (data, type, row) {
                     if (type === 'display' || type === 'filter') {
                         const button = `
-                            <button onclick="fetchUser('${domain}',${row.id})" class="btn btn-edit">
+                            <button class="btn btn-edit user-link" data-id="${row.id}" data-key="users">
                                 <img src="/static/images/edit.png" class="mx-1 py-1" style="max-height: 30px;">
                             </button>
                         `;
@@ -53,6 +53,11 @@ function populateUser(domain) {
             }
         ]
     });
+    $('#usersTable').on('click', '.user-link', function () {
+        const idLabel = $(this).data('id');
+        const key = $(this).data('key');
+        fetchOne(domain, key, idLabel);  
+    });
 }
 
 
@@ -62,7 +67,7 @@ function fetchUser(domain, userId) {
         method: 'GET',
         success: function (data) {
 
-            openEditModal('user', 'user', data);
+            openEditModal('users', data);
         },
         error: function (error) {
             console.error('Erreur :', error);

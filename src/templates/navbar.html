@@ -18,10 +18,13 @@
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
 
         <ul class="navbar-nav fs-5">
+            {% if user.is_superuser %}
             <li class="nav-item dropdown">
                 <a class="nav-link" href="{% url 'authentification:page_users' %}"><img class=""
                         style="max-height: 30px; margin-top:-10px" src="{% static 'images/users.png' %}" alt=""></a>
             </li>
+            {% endif %}
+
             <li class="nav-item dropdown">
                 <a class="nav-link" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown"
                     aria-expanded="false">
@@ -42,6 +45,35 @@
                     </li>
                     <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">Les bases essentielles à
                             connaître</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">Mise en forme conditionnelle
+                            et la liste deroulante</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">Tableaux et graphiques
+                            croises dynamiques</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">Cas facturation</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">Complet operation base</a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">enonce CA par produit</a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item texte-bleu" href="{% url 'tp1:page_tp1' %}">revision statistiques</a>
+                    </li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>

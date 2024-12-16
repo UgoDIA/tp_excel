@@ -24,7 +24,7 @@ def register_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect(reverse('main:index'))
+        return redirect(reverse('tp1:page_tp1'))
     elif request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -33,7 +33,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect(reverse('main:index'))
+            return redirect(reverse('tp1:page_tp1'))
         else:
             messages.error(request, ("Identifiant et/ou mot de passe incorrect(s)"))
             return redirect(reverse('authentification:login'))

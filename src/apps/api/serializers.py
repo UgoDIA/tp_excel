@@ -27,6 +27,16 @@ class UserSerializer(serializers.ModelSerializer):
         response['groups'] = GroupSerializer(
             instance.groups.all(), many=True).data
         return response
+    
+    def create(self, validated_data):
+        groups_data = validated_data.pop('groups', [])
+        user = User(**validated_data)
+        user.set_password(user.username)
+        user.save()
+        if groups_data:
+            user.groups.set(groups_data)
+
+        return user
 
 class CalcSimpleSerializer(serializers.ModelSerializer):
     class Meta:

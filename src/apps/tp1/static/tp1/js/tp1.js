@@ -4,9 +4,8 @@ $(document).ready(function () {
     const container = document.getElementById('table_calc_simple');
 
 
-    // Initialize Handsontable
     const hot = new Handsontable(container, {
-        data: [], // Initial empty data
+        data: [], 
         colHeaders: ['Produit', 'Nb Achats', 'Nb Ventes', 'Prix Unitaire', 'Stock', 'Chiffre d\'affaires', 'Actions'],
         columns: [
             { data: 'produit', type: 'text', className: 'htCenter' },
@@ -31,26 +30,25 @@ $(document).ready(function () {
         autoColumnSize: true,
         stretchH: 'none',
         afterLoadData: function () {
-            bindDeleteButtonEvents(); // Ensure delete buttons are bound after data load
+            bindDeleteButtonEvents(); 
         },
         afterChange: function (changes, source) {
-            if (source === 'edit') { // Only act on user edits
+            if (source === 'edit') { 
                 changes.forEach(([row, prop, oldValue, newValue]) => {
-                    const updatedRow = hot.getSourceDataAtRow(row); // Get the full row data
-                    const itemId = updatedRow.id_calc_simple; // Extract the item ID
+                    const updatedRow = hot.getSourceDataAtRow(row); 
+                    const itemId = updatedRow.id_calc_simple; 
 
-                    // Check if the column being updated is either nb_achats or nb_ventes
+                 
                     if (prop === 'nb_achats' || prop === 'nb_ventes') {
-                        // Update the stock value when nb_achats or nb_ventes changes
+                    
                         const nbAchats = updatedRow.nb_achats || 0;
                         const nbVentes = updatedRow.nb_ventes || 0;
                         const stock = nbAchats - nbVentes;
 
-                        // Set the new stock value
-                        hot.setDataAtRowProp(row, 'stock', stock); // Update stock in Handsontable
+                        hot.setDataAtRowProp(row, 'stock', stock); 
 
-                        // Update the row data for PUT request
-                        updatedRow.stock = stock; // Update stock value for PUT request
+                       
+                        updatedRow.stock = stock; 
                     }
 
                     if (prop === 'nb_ventes' || prop === 'prix_unitaire') {
@@ -58,11 +56,10 @@ $(document).ready(function () {
                         const prixUnitaire = updatedRow.prix_unitaire || 0;
                         const ca = nbVentes * prixUnitaire;
 
-                        // Set the new Chiffre d'Affaires value
-                        hot.setDataAtRowProp(row, 'ca', ca); // Update Chiffre d'Affaires in Handsontable
+                        hot.setDataAtRowProp(row, 'ca', ca); 
 
-                        // Update the row data for PUT request
-                        updatedRow.ca = ca; // Update Chiffre d'Affaires value for PUT request
+                      
+                        updatedRow.ca = ca; 
                     }
 
 
@@ -72,7 +69,7 @@ $(document).ready(function () {
                             return;
                         }
 
-                        // Send the updated row data to the API
+                    
                         $.ajax({
                             url: `${domain}/tp_excel/api/calc_simple/${itemId}/`,
                             method: 'PUT',
@@ -80,7 +77,7 @@ $(document).ready(function () {
                             headers: {
                                 'X-CSRFToken': csrfToken,
                             },
-                            data: JSON.stringify(updatedRow), // Convert to JSON
+                            data: JSON.stringify(updatedRow), 
                             success: function (response) {
                                 console.log('Row updated successfully:', response);
                             },
@@ -95,13 +92,13 @@ $(document).ready(function () {
         }
     });
 
-    // Fetch data using jQuery
+
     $.ajax({
-        url: domain + '/tp_excel/api/calc_simple/', //order by id
+        url: domain + '/tp_excel/api/calc_simple/', 
         method: 'GET',
         success: function (data) {
-            hot.loadData(data); // Load data into Handsontable
-            // hot.render();
+            hot.loadData(data); 
+            
         },
         error: function (xhr, status, error) {
             console.error('Error fetching data:', error);
@@ -110,14 +107,14 @@ $(document).ready(function () {
     function bindDeleteButtonEvents() {
         $(document).off('click', '.delete-btn');
         $(document).on('click', '.delete-btn', function () {
-            const row = $(this).closest('tr')[0].rowIndex; // Get the row index
-            const id = $(this).data('id'); // Get the ID from the button's data-id attribute
+            const row = $(this).closest('tr')[0].rowIndex; 
+            const id = $(this).data('id'); 
             deleteRow(row, id);
-            // console.log('delete')
+      
         });
     }
     function deleteRow(row, id) {
-        // Send the DELETE request to the API
+  
         $.ajax({
             url: `${domain}/tp_excel/api/calc_simple/${id}/`,
             method: 'DELETE',
@@ -127,8 +124,8 @@ $(document).ready(function () {
             success: function (response) {
                 console.log('Row deleted successfully:', response);
 
-                // Reload the data from the server
-                reloadData(); // This function reloads the entire table data
+               
+                reloadData(); 
             },
             error: function (xhr, status, error) {
                 console.error('Error deleting row:', error);
@@ -138,12 +135,12 @@ $(document).ready(function () {
     }
 
     function reloadData() {
-        // Fetch data from the server again
+       
         $.ajax({
-            url: domain + '/tp_excel/api/calc_simple/', //order by id
+            url: domain + '/tp_excel/api/calc_simple/', 
             method: 'GET',
             success: function (data) {
-                // Reload the data into Handsontable
+               
                 hot.loadData(data);
             },
             error: function (xhr, status, error) {
@@ -153,36 +150,27 @@ $(document).ready(function () {
     }
 
     $('#addRowButton').on('click', function () {
-        // Create a new empty row
+      
         const newRow = {
             produit: '',
         };
 
-        // Add the new row to Handsontable
-        const newRowIndex = hot.countRows();  // Get the index where to insert the new row
+  
+        const newRowIndex = hot.countRows(); 
         hot.alter('insert_row_below', newRowIndex);
 
-        // Set the data for the new row
-        // hot.setDataAtRowProp(newRowIndex, 'produit', newRow.produit);
-        // hot.setDataAtRowProp(newRowIndex, 'nb_achats', newRow.nb_achats);
-        // hot.setDataAtRowProp(newRowIndex, 'nb_ventes', newRow.nb_ventes);
-        // hot.setDataAtRowProp(newRowIndex, 'prix_unitaire', newRow.prix_unitaire);
-        // hot.setDataAtRowProp(newRowIndex, 'stock', newRow.stock);
-        // hot.setDataAtRowProp(newRowIndex, 'ca', newRow.ca);
-
-        // Send the new row data to the API
         $.ajax({
             url: domain + '/tp_excel/api/calc_simple/',
             method: 'POST',
             contentType: 'application/json',
             headers: {
-                'X-CSRFToken': csrfToken, // Include the CSRF token here
+                'X-CSRFToken': csrfToken, 
             },
-            data: JSON.stringify(newRow), // Send the new row data
+            data: JSON.stringify(newRow), 
             success: function (response) {
                 console.log('New row added successfully:', response);
-                // Optionally, update the row with the returned data (e.g., with an ID)
-                const rowId = response.id; // Get the ID from the response
+               
+                const rowId = response.id; 
                 hot.setDataAtRowProp(newRowIndex, 'id_calc_simple', rowId);
             },
             error: function (xhr, status, error) {
@@ -195,7 +183,7 @@ $(document).ready(function () {
     const container2 = document.getElementById('table_ref_absolue');
 
     const hotTab2 = new Handsontable(container2, {
-        data: [], // Empty data initially
+        data: [], 
         colHeaders: ['Pays', 'CA', 'Part', 'Actions'],
         columns: [
             { data: 'pays', type: 'text', className: 'htCenter' },
@@ -217,7 +205,7 @@ $(document).ready(function () {
         autoColumnSize: true,
     });
 
-    // Fetch data from API and load into Handsontable
+ 
     function loadTab2Data() {
         $.ajax({
             url: `${domain}/tp_excel/api/ca/?order_by=id_ca`,
@@ -231,9 +219,9 @@ $(document).ready(function () {
         });
     }
 
-    loadTab2Data(); // Load data initially when the page loads
+    loadTab2Data(); 
 
-    // Delete functionality for Tab 2
+  
     $(document).on('click', '.delete-btn', function () {
         const id = $(this).data('id');
         $.ajax({
@@ -241,7 +229,7 @@ $(document).ready(function () {
             method: 'DELETE',
             success: function (response) {
                 console.log('Row deleted successfully for Tab 2:', response);
-                loadTab2Data(); // Reload data after deletion
+                loadTab2Data(); 
             },
             error: function (xhr, status, error) {
                 console.error('Error deleting row for Tab 2:', error);
@@ -250,9 +238,8 @@ $(document).ready(function () {
         });
     });
 
-    // Add new row for Tab 2
     $('#addRowButtonTab2').on('click', function () {
-        const newRow = { pays: '', ca: null, part: null }; // Default values for the new row
+        const newRow = { pays: '', ca: null, part: null }; 
         $.ajax({
             url: `${domain}/tp_excel/api/ca/`,
             method: 'POST',
@@ -260,7 +247,7 @@ $(document).ready(function () {
             data: JSON.stringify(newRow),
             success: function (response) {
                 console.log('New row added successfully for Tab 2:', response);
-                loadTab2Data(); // Reload data to reflect the newly added row
+                loadTab2Data(); 
             },
             error: function (xhr, status, error) {
                 console.error('Error adding row for Tab 2:', error);
