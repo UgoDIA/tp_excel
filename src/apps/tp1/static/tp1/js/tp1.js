@@ -170,7 +170,7 @@ $(document).ready(function () {
             success: function (response) {
                 console.log('New row added successfully:', response);
                
-                const rowId = response.id; 
+                const rowId = response.id_calc_simple; 
                 hot.setDataAtRowProp(newRowIndex, 'id_calc_simple', rowId);
             },
             error: function (xhr, status, error) {
