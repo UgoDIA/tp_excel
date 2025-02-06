@@ -7,17 +7,12 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Repository') {
-            steps {
-                checkout scm
-            }
-        }
 
-        stage('Deploy to Server') {
+        stage('Clone Repository') {
             steps {
                 script {
-                    // Copy new files from Jenkins workspace to app directory
-                    sh "rsync -av --delete ${WORKSPACE}/ ${APP_DIR}/"
+                    // Pull latest changes from GitHub
+                    sh "cd ${APP_DIR} && sudo git pull"
                 }
             } 
         }
@@ -26,7 +21,7 @@ pipeline {
             steps {
                 script {
                     // Use bash shell for source command
-                    sh "bash -c 'source ${VENV_DIR}/bin/activate && pip install -r ${APP_DIR}/requirements.txt'"
+                    sh "bash -c 'source ${VENV_DIR}/bin/activate && pip install -r requirements.txt'"
                 }
             }
         }
