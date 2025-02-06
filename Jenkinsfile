@@ -2,17 +2,13 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = "/var/www/tp_excel"
         VENV_DIR = "/var/www/tp_excel/.venv"
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout Repository') {
             steps {
-                script {
-                    // Pull latest changes from GitHub
-                    sh "cd ${APP_DIR} && git pull origin main"
-                }
+                checkout scm
             }
         }
 
@@ -20,7 +16,7 @@ pipeline {
             steps {
                 script {
                     // Activate virtual environment and install dependencies
-                    sh "source ${VENV_DIR}/bin/activate && pip install -r ${APP_DIR}/requirements.txt"
+                    sh "source ${VENV_DIR}/bin/activate && pip install -r requirements.txt"
                 }
             }
         }
