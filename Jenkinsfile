@@ -15,8 +15,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Activate virtual environment and install dependencies
-                    sh "source ${VENV_DIR}/bin/activate && pip install -r requirements.txt"
+                    // Use bash shell for source command
+                    sh "bash -c 'source ${VENV_DIR}/bin/activate && pip install -r requirements.txt'"
                 }
             }
         }
