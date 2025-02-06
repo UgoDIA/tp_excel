@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        APP_DIR = "/var/www/tp_excel"
         VENV_DIR = "/var/www/tp_excel/.venv"
     }
 
@@ -9,6 +10,16 @@ pipeline {
         stage('Checkout Repository') {
             steps {
                 checkout scm
+            }
+        }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                script {
+                    // Pull latest changes from GitHub
+                    sh "bash -c ' cd ${APP_DIR} && sudo git pull'"
+                }
             }
         }
 
