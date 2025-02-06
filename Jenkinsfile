@@ -13,15 +13,13 @@ pipeline {
             }
         }
 
-    stages {
         stage('Clone Repository') {
             steps {
                 script {
                     // Pull latest changes from GitHub
-                    sh "bash -c ' cd ${APP_DIR} && sudo git pull'"
+                    sh "cd ${APP_DIR} && sudo git pull"
                 }
             }
-        }
 
         stage('Install Dependencies') {
             steps {
