@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     // Restart Gunicorn and Nginx to apply the changes
-                    sh "sudo systemctl restart gunicorn"
+                    sh "sudo systemctl restart tp_excel"
                     sh "sudo systemctl restart nginx"
                 }
             }
