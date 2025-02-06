@@ -7,12 +7,15 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Repository') {
-            steps {
-                checkout scm
-            }
-        }
 
+        stage('Clone Repository') {
+            steps {
+                script {
+                    // Pull latest changes from GitHub
+                    sh "cd ${APP_DIR} && sudo git pull"
+                }
+            } 
+        }
 
         stage('Install Dependencies') {
             steps {
