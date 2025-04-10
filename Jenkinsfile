@@ -27,9 +27,17 @@ pipeline {
         }
 
         stage('Run Tests') {
+            environment {
+                DJANGO_KEY = credentials('DJANGO_KEY')
+                DBUSER = credentials('DBUSER')
+                DBNAME = credentials('DBNAME')
+                DBPWD = credentials('DBPWD')
+                DBHOST = credentials('DBHOST')
+                DBPORT = credentials('DBPORT')
+            }
             steps {
                 script {
-                    sh "bash -c 'source .venv/bin/activate && export DJANGO_KEY=12345 && cd src && python manage.py test'"
+                    sh "bash -c 'source .venv/bin/activate && cd src && python manage.py test'"
                 }
             }
         }
