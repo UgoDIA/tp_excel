@@ -26,6 +26,14 @@ pipeline {
             }
         }
 
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh "bash -c 'source .venv/bin/activate && cd src && python manage.py test'"
+                }
+            }
+        }
+
 
         stage('Deploy to Production') {
             steps {
