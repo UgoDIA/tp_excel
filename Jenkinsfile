@@ -7,21 +7,31 @@ pipeline {
     }
 
     stages {
-
         stage('Clone Repository') {
             steps {
                 script {
-                    // Pull latest changes from GitHub
-                    sh "cd ${APP_DIR} && sudo git pull"
+                    // Jenkins will pull the repo into its own workspace by default
+                    echo "Repository cloned into Jenkins workspace: ${env.WORKSPACE}"
                 }
-            } 
+            }
         }
 
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Use bash shell for source command
-                    sh "bash -c 'source ${VENV_DIR}/bin/activate && pip install -r requirements.txt'"
+                    // Create temp venv inside Jenkins workspace (optional)
+                    sh "python3 -m venv .venv"
+                    sh "bash -c 'source .venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt'"
+                }
+            }
+        }
+
+
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    // Sync code from Jenkins workspace to live app folder
+                    sh "sudo rsync -av --delete ${env.WORKSPACE}/ ${APP_DIR}/"
                 }
             }
         }
@@ -29,7 +39,6 @@ pipeline {
         stage('Restart Services') {
             steps {
                 script {
-                    // Restart Gunicorn and Nginx to apply the changes
                     sh "sudo systemctl restart tp_excel"
                     sh "sudo systemctl restart nginx"
                 }
