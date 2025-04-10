@@ -29,7 +29,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    sh "bash -c 'source .venv/bin/activate && cd src && python manage.py test'"
+                    sh "bash -c 'source .venv/bin/activate && export DJANGO_KEY=12345 && cd src && python manage.py test'"
                 }
             }
         }
