@@ -38,6 +38,14 @@ pipeline {
             }
         }
 
+        stage('Collect Static Files') {
+            steps {
+                script {
+                    sh "bash -c 'source ${VENV_DIR}/bin/activate && cd ${APP_DIR}/src && python manage.py collectstatic --noinput'"
+                }
+            }
+        }
+
         stage('Restart Services') {
             steps {
                 script {
