@@ -31,7 +31,9 @@ pipeline {
             steps {
                 script {
                     // Sync code from Jenkins workspace to live app folder
-                    sh "sudo rsync -av --delete ${env.WORKSPACE}/ ${APP_DIR}/"
+                    
+                    sh "sudo rsync -av --delete --exclude='.env' --exclude='tp_excel.sock' ${env.WORKSPACE}/ ${APP_DIR}/"
+                    sh "sudo chown -R www-data:www-data ${APP_DIR}"
                 }
             }
         }
