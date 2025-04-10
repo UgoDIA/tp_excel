@@ -7,26 +7,26 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone du repo git') {
             steps {
                 script {
-                    // Jenkins will pull the repo into its own workspace by default
-                    echo "Repository cloned into Jenkins workspace: ${env.WORKSPACE}"
+                   
+                    echo "Repo cloné dans le workspace jenkins: ${env.WORKSPACE}"
                 }
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install des dépendances python') {
             steps {
                 script {
-                    // Create temp venv inside Jenkins workspace (optional)
+                    // venv temporaire pour le workspace jenkins
                     sh "python3 -m venv .venv"
                     sh "bash -c 'source .venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt'"
                 }
             }
         }
 
-        stage('Run Tests') {
+        stage('Tests') {
             environment {
                 DJANGO_KEY = credentials('DJANGO_KEY')
                 DBUSER = credentials('DBUSER')
@@ -43,10 +43,10 @@ pipeline {
         }
 
 
-        stage('Deploy to Production') {
+        stage('Déploiement en production') {
             steps {
                 script {
-                    // Sync code from Jenkins workspace to live app folder
+                    // Sync les fichiers du workspace jenkins vers le dossier de prod 
                     
                     sh "sudo rsync -av --delete --exclude='.env' --exclude='tp_excel.sock' ${env.WORKSPACE}/ ${APP_DIR}/"
                     sh "sudo chown -R www-data:www-data ${APP_DIR}"
@@ -55,7 +55,7 @@ pipeline {
 
         }
 
-        stage('Collect Static Files') {
+        stage('Collecte static files') {
             steps {
                 script {
                     sh "sudo bash -c 'source ${VENV_DIR}/bin/activate && cd ${APP_DIR}/src && python manage.py collectstatic --noinput'"
@@ -63,7 +63,7 @@ pipeline {
             }
         }
 
-        stage('Restart Services') {
+        stage('Restart services') {
             steps {
                 script {
                     sh "sudo systemctl restart tp_excel"
@@ -75,18 +75,18 @@ pipeline {
     post {
         success {
             mail (
-                subject: "✅ Jenkins Job ${env.JOB_NAME} #${env.BUILD_NUMBER} Succeeded",
-                body: """<p>The Jenkins job <b>${env.JOB_NAME} #${env.BUILD_NUMBER}</b> completed successfully.</p>
-                         <p>Check details at: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
+                subject: "✅ Succès du job Jenkins ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """<p>Le job Jenkins <b>${env.JOB_NAME} #${env.BUILD_NUMBER}</b> s'est terminé avec succès.</p>
+                         <p>Vous pouvez consulter les détails ici : <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
                 to: "ugofokyin@gmail.com",
                 mimeType: 'text/html'
             )
         }
         failure {
             mail (
-                subject: "❌ Jenkins Job ${env.JOB_NAME} #${env.BUILD_NUMBER} Failed",
-                body: """<p>The Jenkins job <b>${env.JOB_NAME} #${env.BUILD_NUMBER}</b> has failed.</p>
-                         <p>Check logs here: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
+                subject: "❌ Échec du job Jenkins ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """<p>Le job Jenkins <b>${env.JOB_NAME} #${env.BUILD_NUMBER}</b> a échoué.</p>
+                         <p>Consultez les logs ici : <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>""",
                 to: "ugofokyin@gmail.com",
                 mimeType: 'text/html'
             )
